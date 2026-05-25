@@ -89,7 +89,7 @@ def delete_review(review_id: str) -> dict:
 # Endpoints de requerimientos funcionales de consulta
 # ===========================================================
 
-@app.get("reviews/query/top10/{start_date}/{end_date}")
+@app.get("/reviews/query/top10/{start_date}/{end_date}")
 def get_top_hotels(start_date: str, end_date: str) -> list|dict:
     result = {}
     start_date = datetime.fromisoformat(start_date)
