@@ -94,8 +94,13 @@ def get_top_hotels(start_date: str, end_date: str) -> list|dict:
     result = {}
     start_date = datetime.fromisoformat(start_date)
     end_date = datetime.fromisoformat(end_date)
-    top_10 = list(db["resenas"].aggregate([{'$match':{'fecha_creacion': {'$gte': start_date, '$lte': end_date}}}, {"$project":{"_id":0}}, {'$group':{'_id':'$hotel_id',
-    'promedio_calificaciones':{'$avg':'$calificacion'}}}, {'$sort':{'promedio_calificaciones': -1}}, {'$limit': 10}]))
+    top_10 = list(db["resenas"].aggregate([
+        {'$addFields': {'fecha_dt': {'$dateFromString': {'dateString': '$fecha_creacion'}}}},
+        {'$match': {'fecha_dt': {'$gte': datetime.fromisoformat(start_date), '$lte': datetime.fromisoformat(end_date)}}},
+        {'$group': {'_id': '$hotel_id', 'promedio_calificaciones': {'$avg': '$calificacion'}, 'total_resenas': {'$sum': 1}}},
+        {'$sort': {'promedio_calificaciones': -1}},
+        {'$limit': 10}
+    ]))
     if len(top_10) > 0:
         result = top_10
     return result
