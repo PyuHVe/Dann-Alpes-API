@@ -92,11 +92,11 @@ def delete_review(review_id: str) -> dict:
 @app.get("/reviews/query/top10/{start_date}/{end_date}")
 def get_top_hotels(start_date: str, end_date: str) -> list|dict:
     result = {}
-    start_date = datetime.fromisoformat(start_date)
-    end_date = datetime.fromisoformat(end_date)
+    start_dt = datetime.fromisoformat(start_date)
+    end_dt = datetime.fromisoformat(end_date)
     top_10 = list(db["resenas"].aggregate([
         {'$addFields': {'fecha_dt': {'$dateFromString': {'dateString': '$fecha_creacion'}}}},
-        {'$match': {'fecha_dt': {'$gte': datetime.fromisoformat(start_date), '$lte': datetime.fromisoformat(end_date)}}},
+        {'$match': {'fecha_dt': {'$gte': start_dt, '$lte': end_dt}}},
         {'$group': {'_id': '$hotel_id', 'promedio_calificaciones': {'$avg': '$calificacion'}, 'total_resenas': {'$sum': 1}}},
         {'$sort': {'promedio_calificaciones': -1}},
         {'$limit': 10}
